@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⚡ 補給快選 | Quick Order</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -47,6 +48,32 @@
 
         .check-icon {
             animation: scaleIn 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+
+        /* Receipt Style for Image Capture */
+        #receipt-render {
+            width: 800px;
+            /* Fixed width for consistent image output */
+            background: white;
+            padding: 40px;
+            position: absolute;
+            left: -9999px;
+            top: 0;
+        }
+
+        .receipt-table th {
+            background-color: #f3f4f6;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .receipt-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .receipt-table tr:last-child td {
+            border-bottom: none;
         }
     </style>
     <script>
@@ -230,7 +257,12 @@
     <div id="cartDrawer"
         class="fixed inset-0 z-50 transform translate-x-full transition-transform duration-300 bg-gray-50 flex flex-col">
         <div class="bg-white px-4 py-3 shadow-sm border-b flex justify-between items-center">
-            <h2 class="text-xl font-bold text-gray-800">🛒 購物車</h2>
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                🛒 購物車
+                <button onclick="clearCart()"
+                    class="text-sm text-red-500 font-bold bg-red-50 px-3 py-1 rounded-full hover:bg-red-100 transition-colors">清空
+                    / Clear</button>
+            </h2>
             <button onclick="closeCart()" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -243,9 +275,18 @@
             <!-- Items injected here -->
         </div>
 
-        <div class="bg-white p-4 border-t safe-area-bottom">
+        <div class="bg-white p-4 border-t safe-area-bottom space-y-3">
+            <button onclick="downloadImage()"
+                class="w-full bg-gray-800 text-white font-bold py-3.5 rounded-xl shadow-lg text-lg flex justify-center items-center gap-2 active:scale-98 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                儲存圖片 (Save Image)
+            </button>
             <button onclick="downloadJSON()"
-                class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 text-lg flex justify-center items-center gap-2 active:scale-98 transition-transform">
+                class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 text-lg flex justify-center items-center gap-2 active:scale-98 transition-transform">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -254,6 +295,27 @@
                 匯出 JSON 檔案
             </button>
         </div>
+    </div>
+
+    <!-- Hidden Receipt Capture Area -->
+    <div id="receipt-render">
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">補給訂單 Supply Order</h1>
+            <p class="text-gray-500 text-lg" id="receiptDate">Date: 2024/01/01</p>
+        </div>
+        <table class="w-full text-lg border-collapse receipt-table">
+            <thead>
+                <tr class="text-gray-600">
+                    <th style="width: 20%">分類</th>
+                    <th style="width: 40%">品名</th>
+                    <th style="width: 40%; text-align: right;">數量</th>
+                </tr>
+            </thead>
+            <tbody id="receiptBody">
+                <!-- Items -->
+            </tbody>
+        </table>
+        <div class="mt-8 text-center text-gray-400 text-sm">Created via 補給快選</div>
     </div>
 
     <!-- Toast -->
@@ -269,70 +331,74 @@
             { id: 'hardware', label: '五金', icon: '🔧', sourceCategory: '五金' },
         ];
         const presetsData = [
-            { "id": 1, "category": "食品", "item": "雞蛋", "quantity": 600, "unit": "個", "common": true },
-            { "id": 2, "category": "食品", "item": "雞肉", "quantity": 60, "unit": "公斤", "common": true },
-            { "id": 3, "category": "食品", "item": "雞腿", "quantity": 30, "unit": "公斤", "common": true },
-            { "id": 4, "category": "食品", "item": "雞爪", "quantity": 20, "unit": "公斤", "common": false },
-            { "id": 5, "category": "食品", "item": "雞心", "quantity": 10, "unit": "公斤", "common": false },
-            { "id": 6, "category": "食品", "item": "豬腿肉", "quantity": 60, "unit": "公斤", "common": true },
-            { "id": 7, "category": "食品", "item": "五花肉", "quantity": 40, "unit": "公斤", "common": true },
-            { "id": 8, "category": "食品", "item": "豬腳", "quantity": 30, "unit": "公斤", "common": false },
-            { "id": 9, "category": "食品", "item": "豬肝", "quantity": 20, "unit": "公斤", "common": false },
-            { "id": 10, "category": "食品", "item": "豬耳朵", "quantity": 30, "unit": "公斤", "common": false },
-            { "id": 11, "category": "食品", "item": "豬排骨", "quantity": 40, "unit": "公斤", "common": true },
-            { "id": 12, "category": "食品", "item": "魚", "quantity": 60, "unit": "公斤", "common": true },
-            { "id": 13, "category": "食品", "item": "花菜（白）", "quantity": 30, "unit": "公斤", "common": true },
-            { "id": 14, "category": "食品", "item": "白菜", "quantity": 50, "unit": "公斤", "common": true },
-            { "id": 15, "category": "食品", "item": "包菜", "quantity": 50, "unit": "公斤", "common": true },
-            { "id": 16, "category": "食品", "item": "空心菜", "quantity": 30, "unit": "公斤", "common": true },
-            { "id": 17, "category": "食品", "item": "小白菜", "quantity": 30, "unit": "公斤", "common": true },
-            { "id": 18, "category": "食品", "item": "香菜", "quantity": 20, "unit": "公斤", "common": false },
-            { "id": 19, "category": "食品", "item": "菠菜", "quantity": 20, "unit": "公斤", "common": true },
-            { "id": 20, "category": "食品", "item": "冬瓜", "quantity": 50, "unit": "公斤", "common": true },
-            { "id": 21, "category": "食品", "item": "南瓜", "quantity": 30, "unit": "公斤", "common": true },
-            { "id": 22, "category": "食品", "item": "黃瓜", "quantity": 20, "unit": "公斤", "common": true },
-            { "id": 23, "category": "食品", "item": "地瓜", "quantity": 30, "unit": "公斤", "common": true },
-            { "id": 24, "category": "食品", "item": "西芹", "quantity": 10, "unit": "公斤", "common": false },
-            { "id": 25, "category": "食品", "item": "西紅柿", "quantity": 10, "unit": "公斤", "common": true },
-            { "id": 26, "category": "食品", "item": "茄子", "quantity": 10, "unit": "公斤", "common": false },
-            { "id": 27, "category": "食品", "item": "豆芽", "quantity": 10, "unit": "公斤", "common": true },
-            { "id": 28, "category": "食品", "item": "豆腐", "quantity": 10, "unit": "公斤", "common": true },
-            { "id": 29, "category": "食品", "item": "土豆", "quantity": 50, "unit": "公斤", "common": true },
-            { "id": 30, "category": "食品", "item": "薑", "quantity": 5, "unit": "公斤", "common": true },
-            { "id": 31, "category": "食品", "item": "洋蔥", "quantity": 30, "unit": "公斤", "common": true },
-            { "id": 32, "category": "食品", "item": "蔥", "quantity": 2, "unit": "公斤", "common": true },
-            { "id": 1, "category": "乾貨", "item": "大米", "quantity": 240, "unit": "公斤", "common": true },
-            { "id": 2, "category": "乾貨", "item": "麵條", "quantity": 20, "unit": "公斤", "common": true },
-            { "id": 3, "category": "乾貨", "item": "排骨雞汁麵", "quantity": 10, "unit": "箱", "common": true },
-            { "id": 4, "category": "乾貨", "item": "麵粉", "quantity": 50, "unit": "公斤", "common": true },
-            { "id": 5, "category": "乾貨", "item": "酵母粉", "quantity": 10, "unit": "盒", "common": true },
-            { "id": 6, "category": "乾貨", "item": "米粉", "quantity": 20, "unit": "公斤", "common": true },
-            { "id": 7, "category": "乾貨", "item": "咖啡", "quantity": 50, "unit": "袋", "common": true },
-            { "id": 8, "category": "乾貨", "item": "礦泉水", "quantity": 50, "unit": "箱", "common": true },
-            { "id": 9, "category": "乾貨", "item": "舒跑", "quantity": 50, "unit": "箱", "common": true },
-            { "id": 10, "category": "乾貨", "item": "老乾媽", "quantity": 3, "unit": "箱", "common": true },
-            { "id": 11, "category": "乾貨", "item": "維士比", "quantity": 2, "unit": "箱", "common": true },
-            { "id": 12, "category": "乾貨", "item": "啤酒", "quantity": 10, "unit": "箱", "common": true },
-            { "id": 13, "category": "乾貨", "item": "大蝦", "quantity": 20, "unit": "公斤", "common": true },
-            { "id": 14, "category": "乾貨", "item": "魷魚", "quantity": 20, "unit": "公斤", "common": true },
-            { "id": 15, "category": "乾貨", "item": "塑膠掃把", "quantity": 10, "unit": "把", "common": true },
-            { "id": 16, "category": "乾貨", "item": "塑膠畚箕", "quantity": 10, "unit": "個", "common": true },
-            { "id": 17, "category": "乾貨", "item": "拖把", "quantity": 10, "unit": "把", "common": true },
-            { "id": 18, "category": "乾貨", "item": "竹掃帚", "quantity": 10, "unit": "把", "common": true },
-            { "id": 19, "category": "乾貨", "item": "沐浴露", "quantity": 24, "unit": "瓶", "common": true },
-            { "id": 20, "category": "乾貨", "item": "香皂", "quantity": 30, "unit": "個", "common": true },
-            { "id": 21, "category": "乾貨", "item": "鹽巴", "quantity": 24, "unit": "瓶", "common": true },
-            { "id": 22, "category": "乾貨", "item": "醬油", "quantity": 24, "unit": "瓶", "common": true },
-            { "id": 23, "category": "乾貨", "item": "雞粉", "quantity": 10, "unit": "罐", "common": true },
-            { "id": 24, "category": "乾貨", "item": "魚罐頭", "quantity": 5, "unit": "箱", "common": true },
-            { "id": 25, "category": "乾貨", "item": "香菇", "quantity": 10, "unit": "公斤", "common": true },
-            { "id": 26, "category": "乾貨", "item": "辣椒醬", "quantity": 5, "unit": "瓶", "common": true },
-            { "id": 27, "category": "乾貨", "item": "大桶煮飯油", "quantity": 8, "unit": "桶", "common": true },
-            { "id": 28, "category": "乾貨", "item": "黏鼠板", "quantity": 10, "unit": "張", "common": true },
-            { "id": 29, "category": "乾貨", "item": "殺蟲劑", "quantity": 10, "unit": "罐", "common": true },
-            { "id": 30, "category": "五金", "item": "螺絲", "quantity": 100, "unit": "個", "common": true },
-            { "id": 31, "category": "五金", "item": "空氣快速接頭", "quantity": 5, "unit": "個", "common": true }
+            { "id": 1, "category": "食品", "item": "雞蛋Egg", "quantity": 600, "unit": "個pic", "common": true },
+            { "id": 2, "category": "食品", "item": "雞肉Chicken", "quantity": 60, "unit": "公斤kg", "common": true },
+            { "id": 3, "category": "食品", "item": "雞腿Chicken leg", "quantity": 30, "unit": "公斤kg", "common": true },
+            { "id": 4, "category": "食品", "item": "雞爪Chicken claw", "quantity": 20, "unit": "公斤kg", "common": false },
+            { "id": 5, "category": "食品", "item": "雞心Chicken heart", "quantity": 10, "unit": "公斤kg", "common": false },
+            { "id": 6, "category": "食品", "item": "豬腿肉Pig leg", "quantity": 60, "unit": "公斤kg", "common": true },
+            { "id": 7, "category": "食品", "item": "五花肉Pork belly", "quantity": 40, "unit": "公斤kg", "common": true },
+            { "id": 8, "category": "食品", "item": "豬腳Pig foot", "quantity": 30, "unit": "公斤kg", "common": false },
+            { "id": 9, "category": "食品", "item": "豬肝Pig liver", "quantity": 20, "unit": "公斤kg", "common": false },
+            { "id": 10, "category": "食品", "item": "豬耳朵Pig ear", "quantity": 30, "unit": "公斤kg", "common": false },
+            { "id": 11, "category": "食品", "item": "豬排骨Pig rib", "quantity": 40, "unit": "公斤kg", "common": true },
+            { "id": 12, "category": "食品", "item": "魚Fish", "quantity": 60, "unit": "公斤kg", "common": true },
+            { "id": 13, "category": "食品", "item": "花菜（白）brocoli(white)", "quantity": 30, "unit": "公斤kg", "common": true },
+            { "id": 14, "category": "食品", "item": "白菜Chinese cabbage", "quantity": 50, "unit": "公斤kg", "common": true },
+            { "id": 15, "category": "食品", "item": "包菜/高麗菜Kale", "quantity": 50, "unit": "公斤kg", "common": true },
+            { "id": 16, "category": "食品", "item": "空心菜Spinach", "quantity": 30, "unit": "公斤kg", "common": true },
+            { "id": 17, "category": "食品", "item": "小白菜Kale", "quantity": 30, "unit": "公斤kg", "common": true },
+            { "id": 18, "category": "食品", "item": "香菜Cilantro", "quantity": 20, "unit": "公斤kg", "common": false },
+            { "id": 19, "category": "食品", "item": "菠菜Spinach", "quantity": 20, "unit": "公斤kg", "common": true },
+            { "id": 20, "category": "食品", "item": "冬瓜winter melon", "quantity": 50, "unit": "公斤kg", "common": true },
+            { "id": 21, "category": "食品", "item": "南瓜pumpkin", "quantity": 30, "unit": "公斤kg", "common": true },
+            { "id": 22, "category": "食品", "item": "黃瓜Cucumber", "quantity": 20, "unit": "公斤kg", "common": true },
+            { "id": 23, "category": "食品", "item": "地瓜Sweet potato", "quantity": 30, "unit": "公斤kg", "common": true },
+            { "id": 24, "category": "食品", "item": "西芹Celery", "quantity": 10, "unit": "公斤kg", "common": false },
+            { "id": 25, "category": "食品", "item": "西紅柿Tomato", "quantity": 10, "unit": "公斤kg", "common": true },
+            { "id": 26, "category": "食品", "item": "茄子Eggplant", "quantity": 10, "unit": "公斤kg", "common": false },
+            { "id": 27, "category": "食品", "item": "豆芽Bean sprout", "quantity": 10, "unit": "公斤kg", "common": true },
+            { "id": 28, "category": "食品", "item": "豆腐Tofu", "quantity": 10, "unit": "公斤kg", "common": true },
+            { "id": 29, "category": "食品", "item": "土豆Potato", "quantity": 50, "unit": "公斤kg", "common": true },
+            { "id": 30, "category": "食品", "item": "薑Ginger", "quantity": 5, "unit": "公斤kg", "common": true },
+            { "id": 31, "category": "食品", "item": "洋蔥Onion", "quantity": 30, "unit": "公斤kg", "common": true },
+            { "id": 32, "category": "食品", "item": "蔥Cilantro", "quantity": 2, "unit": "公斤kg", "common": true },
+            { "id": 1, "category": "乾貨", "item": "大米Rice", "quantity": 240, "unit": "公斤kg", "common": true },
+            { "id": 2, "category": "乾貨", "item": "麵條Noodle", "quantity": 20, "unit": "公斤kg", "common": true },
+            { "id": 3, "category": "乾貨", "item": "排骨雞汁麵Pork bone soup noodle", "quantity": 10, "unit": "箱box", "common": true },
+            { "id": 4, "category": "乾貨", "item": "麵粉Flour", "quantity": 50, "unit": "公斤kg", "common": true },
+            { "id": 5, "category": "乾貨", "item": "酵母粉Yeast", "quantity": 10, "unit": "盒box", "common": true },
+            { "id": 6, "category": "乾貨", "item": "米粉Rice flour", "quantity": 20, "unit": "公斤kg", "common": true },
+            { "id": 7, "category": "乾貨", "item": "咖啡Coffee", "quantity": 50, "unit": "袋bag", "common": true },
+            { "id": 8, "category": "乾貨", "item": "礦泉水water", "quantity": 50, "unit": "箱box", "common": true },
+            { "id": 9, "category": "乾貨", "item": "舒跑Super Supau", "quantity": 50, "unit": "箱box", "common": true },
+            { "id": 10, "category": "乾貨", "item": "老乾媽Lao Gan Ma", "quantity": 3, "unit": "箱box", "common": true },
+            { "id": 11, "category": "乾貨", "item": "維士比Vita", "quantity": 2, "unit": "箱box", "common": true },
+            { "id": 12, "category": "乾貨", "item": "啤酒Beer", "quantity": 10, "unit": "箱box", "common": true },
+            { "id": 13, "category": "乾貨", "item": "大蝦Shrimp", "quantity": 20, "unit": "公斤kg", "common": true },
+            { "id": 14, "category": "乾貨", "item": "魷魚Octopus", "quantity": 20, "unit": "公斤kg", "common": true },
+            { "id": 15, "category": "乾貨", "item": "塑膠掃把Plastic broom", "quantity": 10, "unit": "把pic", "common": true },
+            { "id": 16, "category": "乾貨", "item": "塑膠畚箕Plastic basket", "quantity": 10, "unit": "個pic", "common": true },
+            { "id": 17, "category": "乾貨", "item": "拖把Mop", "quantity": 10, "unit": "把pic", "common": true },
+            { "id": 18, "category": "乾貨", "item": "竹掃帚Bamboo broom", "quantity": 10, "unit": "把pic", "common": true },
+            { "id": 19, "category": "乾貨", "item": "沐浴露Shower Gel", "quantity": 24, "unit": "瓶bottle", "common": true },
+            { "id": 20, "category": "乾貨", "item": "香皂Soap", "quantity": 30, "unit": "個pic", "common": true },
+            { "id": 21, "category": "乾貨", "item": "鹽巴Salt", "quantity": 24, "unit": "公斤kg", "common": true },
+            { "id": 22, "category": "乾貨", "item": "醬油Soy sauce", "quantity": 24, "unit": "瓶bottle", "common": true },
+            { "id": 23, "category": "乾貨", "item": "雞粉Chicken powder", "quantity": 10, "unit": "罐bottle", "common": true },
+            { "id": 24, "category": "乾貨", "item": "魚罐頭Fish can", "quantity": 5, "unit": "箱box", "common": true },
+            { "id": 25, "category": "乾貨", "item": "香菇Shiitake mushroom", "quantity": 10, "unit": "公斤kg", "common": true },
+            { "id": 26, "category": "乾貨", "item": "辣椒醬Chili sauce", "quantity": 5, "unit": "瓶bottle", "common": true },
+            { "id": 27, "category": "乾貨", "item": "大桶煮飯油Cooking oil", "quantity": 8, "unit": "桶", "common": true },
+            { "id": 28, "category": "乾貨", "item": "黏鼠板Mouse trap", "quantity": 10, "unit": "張pic", "common": true },
+            { "id": 29, "category": "乾貨", "item": "殺蟲劑Insecticide", "quantity": 10, "unit": "罐bottle", "common": true },
+            { "id": 30, "category": "乾貨", "item": "衛生紙tissue", "quantity": 5, "unit": "箱box", "common": true },
+            { "id": 31, "category": "五金", "item": "螺絲Screw", "quantity": 100, "unit": "個pic", "common": true },
+            { "id": 32, "category": "五金", "item": "空氣快速接頭Air quick connector", "quantity": 5, "unit": "個pic", "common": true }
         ];
+
+        // Fix Duplicate IDs: Re-index all items to ensure unique IDs
+        presetsData.forEach((p, i) => p.id = i + 1);
 
         let currentTab = 'food';
         let orderList = JSON.parse(localStorage.getItem('supplyOrderList')) || [];
@@ -565,6 +631,14 @@
             document.getElementById('cartDrawer').classList.add('translate-x-full');
         }
 
+        function clearCart() {
+            if (orderList.length === 0) return alert("購物車已經是空的");
+            if (confirm("確定要清空所有項目嗎？ (Clear all items?)")) {
+                orderList = [];
+                saveAndRender();
+            }
+        }
+
         function renderCartList() {
             const container = document.getElementById('cartList');
             if (orderList.length === 0) {
@@ -595,6 +669,63 @@
             `).join('');
         }
 
+        async function downloadImage() {
+            if (orderList.length === 0) return alert("清單是空的");
+
+            // Identify unique categories
+            const categories = [...new Set(orderList.map(item => item.category))];
+
+            // Generate for each category
+            for (const cat of categories) {
+                await generateCategoryReceipt(cat);
+            }
+        }
+
+        async function generateCategoryReceipt(category) {
+            const catItems = orderList.filter(item => item.category === category);
+            if (catItems.length === 0) return;
+
+            // Update View
+            const today = new Date();
+            const dateStr = `${today.getFullYear()}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getDate().toString().padStart(2, '0')}`;
+            document.getElementById('receiptDate').innerText = `Date: ${dateStr}`;
+
+            // Set dynamic title based on category
+            const titleEl = document.querySelector('#receipt-render h1');
+            titleEl.innerText = `補給訂單 - ${category}`;
+
+            const tbody = document.getElementById('receiptBody');
+            tbody.innerHTML = catItems.map(item => `
+                <tr>
+                    <td class="text-gray-500">${item.category}</td>
+                    <td class="font-bold text-gray-800">${item.item}</td>
+                    <td class="text-right font-bold text-gray-800">${item.quantity} ${item.unit}</td>
+                </tr>
+            `).join('');
+
+            showToast(`正在建立圖片 (${category})...`);
+
+            // Wait for DOM update
+            await new Promise(r => setTimeout(r, 100));
+
+            try {
+                const canvas = await html2canvas(document.getElementById('receipt-render'), { useCORS: true, scale: 2 });
+                const link = document.createElement('a');
+                // Clean filename
+                link.download = `supply_order_${category}_${dateStr.replace(/\//g, '')}.png`;
+                link.href = canvas.toDataURL("image/png");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Small delay between downloads
+                await new Promise(r => setTimeout(r, 800));
+            } catch (err) {
+                console.error(err);
+                alert("Error generating image: " + err);
+            }
+        }
+
         function downloadJSON() {
             if (orderList.length === 0) return alert("清單是空的");
             const dataStr = JSON.stringify(orderList, null, 2);
@@ -616,7 +747,8 @@
             t.innerText = msg;
             t.classList.remove('opacity-0', 'translate-y-4');
             t.classList.add('opacity-100');
-            setTimeout(() => {
+            clearTimeout(t.timer);
+            t.timer = setTimeout(() => {
                 t.classList.remove('opacity-100');
                 t.classList.add('opacity-0');
             }, 2000);
