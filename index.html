@@ -159,7 +159,13 @@
                 <button onclick="adjustModalQty('modalQtyInput', 1)"
                     class="flex-shrink-0 w-12 h-12 rounded-xl bg-primary text-white text-2xl font-bold active:bg-blue-700 indent-0 flex items-center justify-center pb-1">+</button>
             </div>
-            <div class="text-center text-gray-400 text-sm mb-6" id="modalUnitHint">單位: 個</div>
+            <div class="text-center text-gray-400 text-sm mb-4" id="modalUnitHint">單位: 個</div>
+
+            <div class="mb-6">
+                <input type="text" id="modalRemark"
+                    class="w-full bg-gray-50 p-3 rounded-lg border-none focus:ring-2 focus:ring-primary text-center"
+                    placeholder="備註 (選填)...">
+            </div>
 
             <div class="flex gap-3">
                 <button onclick="closeQtyModal()"
@@ -193,6 +199,13 @@
                 <input type="text" id="editUnitInput"
                     class="w-full bg-gray-50 p-3 rounded-lg border-none focus:ring-2 focus:ring-primary font-bold text-lg text-center mt-1"
                     placeholder="單位" value="">
+            </div>
+
+            <div class="mb-8">
+                <label class="text-xs font-bold text-gray-500 ml-1">備註 (Remark)</label>
+                <input type="text" id="editRemark"
+                    class="w-full bg-gray-50 p-3 rounded-lg border-none focus:ring-2 focus:ring-primary text-center mt-1"
+                    placeholder="備註 (選填)..." value="">
             </div>
 
             <div class="flex gap-3">
@@ -241,6 +254,12 @@
                             class="w-full bg-gray-50 p-3 rounded-lg border-none focus:ring-2 focus:ring-primary font-bold text-lg text-center"
                             value="個">
                     </div>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500">備註</label>
+                    <input type="text" id="customRemark"
+                        class="w-full bg-gray-50 p-3 rounded-lg border-none focus:ring-2 focus:ring-primary"
+                        placeholder="備註 (選填)...">
                 </div>
             </div>
 
@@ -306,16 +325,17 @@
         <table class="w-full text-lg border-collapse receipt-table">
             <thead>
                 <tr class="text-gray-600">
-                    <th style="width: 20%">分類</th>
-                    <th style="width: 40%">品名</th>
-                    <th style="width: 40%; text-align: right;">數量</th>
+                    <th style="width: 15%">分類</th>
+                    <th style="width: 35%">品名</th>
+                    <th style="width: 25%">數量</th>
+                    <th style="width: 25%">備註</th>
                 </tr>
             </thead>
             <tbody id="receiptBody">
                 <!-- Items -->
             </tbody>
         </table>
-        <div class="mt-8 text-center text-gray-400 text-sm">Created via 補給快選</div>
+        <div class="mt-8 text-center text-gray-400 text-sm">Created via Luke</div>
     </div>
 
     <!-- Toast -->
@@ -394,7 +414,21 @@
             { "id": 29, "category": "乾貨", "item": "殺蟲劑Insecticide", "quantity": 10, "unit": "罐bottle", "common": true },
             { "id": 30, "category": "乾貨", "item": "衛生紙tissue", "quantity": 5, "unit": "箱box", "common": true },
             { "id": 31, "category": "五金", "item": "螺絲Screw", "quantity": 100, "unit": "個pic", "common": true },
-            { "id": 32, "category": "五金", "item": "空氣快速接頭Air quick connector", "quantity": 5, "unit": "個pic", "common": true }
+            { "id": 32, "category": "五金", "item": "焊接用氧氣瓶Oxygen bottle", "quantity": 5, "unit": "瓶bottle", "common": true },
+            { "id": 33, "category": "五金", "item": "焊接用乙炔Acetylene bottle", "quantity": 5, "unit": "瓶bottle", "common": true },
+            { "id": 34, "category": "五金", "item": "手套gloves", "quantity": 5, "unit": "包bag", "common": true },
+            { "id": 35, "category": "五金", "item": "護目鏡goggles", "quantity": 10, "unit": "個pic", "common": true },
+            { "id": 36, "category": "五金", "item": "電焊線welding wire", "quantity": 5, "unit": "條pic", "common": true },
+            { "id": 37, "category": "五金", "item": "電焊夾welding clamp", "quantity": 5, "unit": "個pic", "common": true },
+            { "id": 38, "category": "五金", "item": "電焊手套welding gloves", "quantity": 5, "unit": "雙pair", "common": true },
+            { "id": 39, "category": "五金", "item": "口罩mask", "quantity": 10, "unit": "盒box", "common": true },
+            { "id": 40, "category": "五金", "item": "焊條welding rod", "quantity": 5, "unit": "箱box", "common": true },
+            { "id": 41, "category": "五金", "item": "鐵板Iron plate", "quantity": 5, "unit": "片sheet", "common": true },
+            { "id": 42, "category": "五金", "item": "空氣接頭(1出3)Air connector(1 out 3)", "quantity": 5, "unit": "個pic", "common": true },
+            { "id": 43, "category": "五金", "item": "空氣快速接頭Air quick connector", "quantity": 5, "unit": "個pic", "common": true },
+            { "id": 44, "category": "五金", "item": "除鏽氣動鏟(機器)Pneumatic rust removal scraper (machine)", "quantity": 5, "unit": "個pic", "common": true },
+            { "id": 45, "category": "五金", "item": "除鏽氣動鏟(鏟頭)Pneumatic rust removal scraper (head)", "quantity": 5, "unit": "個pic", "common": true },
+            { "id": 46, "category": "五金", "item": "除鏽碗刷Rust Removal Brush", "quantity": 5, "unit": "個pic", "common": true }
         ];
 
         // Fix Duplicate IDs: Re-index all items to ensure unique IDs
@@ -475,6 +509,7 @@
             document.getElementById('modalItemName').innerText = item.item;
             document.getElementById('modalQtyInput').value = item.quantity;
             document.getElementById('modalUnitHint').innerText = `單位: ${item.unit}`;
+            document.getElementById('modalRemark').value = ''; // Reset remark
             toggleModal('qtyModal', true);
             setTimeout(() => document.getElementById('modalQtyInput').select(), 50);
         }
@@ -491,6 +526,7 @@
             document.getElementById('editItemName').innerText = item.item;
             document.getElementById('editQtyInput').value = item.quantity;
             document.getElementById('editUnitInput').value = item.unit;
+            document.getElementById('editRemark').value = item.remark || '';
             toggleModal('editModal', true);
             setTimeout(() => document.getElementById('editQtyInput').select(), 50);
         }
@@ -504,12 +540,14 @@
             if (editingIndex === -1) return;
             const qty = parseFloat(document.getElementById('editQtyInput').value);
             const unit = document.getElementById('editUnitInput').value.trim();
+            const remark = document.getElementById('editRemark').value.trim();
 
             if (!qty || qty <= 0) return alert('請輸入有效數量');
             if (!unit) return alert('請輸入單位');
 
             orderList[editingIndex].quantity = qty;
             orderList[editingIndex].unit = unit;
+            orderList[editingIndex].remark = remark;
 
             saveAndRender();
             closeEditModal();
@@ -566,7 +604,8 @@
         function confirmAddToOrder() {
             if (!currentModalItem) return;
             const qty = parseFloat(document.getElementById('modalQtyInput').value);
-            addItem({ ...currentModalItem, quantity: qty, id: Date.now() });
+            const remark = document.getElementById('modalRemark').value.trim();
+            addItem({ ...currentModalItem, quantity: qty, remark: remark, id: Date.now() });
             closeQtyModal();
         }
 
@@ -575,6 +614,7 @@
             const name = document.getElementById('customName').value.trim();
             const qty = parseFloat(document.getElementById('customQty').value);
             const unit = document.getElementById('customUnit').value.trim();
+            const remark = document.getElementById('customRemark').value.trim();
 
             if (!name) return alert('請輸入名稱');
 
@@ -583,11 +623,13 @@
                 category: cat,
                 item: name,
                 quantity: qty || 1,
-                unit: unit || '個'
+                unit: unit || '個',
+                remark: remark
             });
 
             // Clear inputs
             document.getElementById('customName').value = '';
+            document.getElementById('customRemark').value = '';
             closeCustomModal();
         }
 
@@ -654,6 +696,7 @@
                             <span class="font-bold text-gray-800 text-lg">${item.item}</span>
                         </div>
                         <div class="text-sm text-gray-500">數量: <span class="font-bold text-gray-800">${item.quantity}</span> ${item.unit}</div>
+                        ${item.remark ? `<div class="text-xs text-orange-500 font-bold mt-1">※ ${item.remark}</div>` : ''}
                     </div>
                     <div class="flex items-center gap-2">
                          <button onclick="openEditModal(${index})" class="p-2 text-gray-400 hover:text-primary transition-colors bg-gray-50 rounded-lg">
@@ -692,14 +735,15 @@
 
             // Set dynamic title based on category
             const titleEl = document.querySelector('#receipt-render h1');
-            titleEl.innerText = `補給訂單 - ${category}`;
+            titleEl.innerText = `神盾菁英-補給清冊 - ${category}`;
 
             const tbody = document.getElementById('receiptBody');
             tbody.innerHTML = catItems.map(item => `
                 <tr>
                     <td class="text-gray-500">${item.category}</td>
                     <td class="font-bold text-gray-800">${item.item}</td>
-                    <td class="text-right font-bold text-gray-800">${item.quantity} ${item.unit}</td>
+                    <td class="text-gray-800">${item.quantity} ${item.unit}</td>
+                    <td class="text-gray-500 text-sm">${item.remark || ''}</td>
                 </tr>
             `).join('');
 
