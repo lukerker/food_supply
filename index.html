@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⚡ 補給快選 | Quick Order</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f3f4f6;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .tap-scale:active {
+            transform: scale(0.97);
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .check-icon {
+            animation: scaleIn 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        success: '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="pb-32 text-gray-800">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-30 glass-nav shadow-sm">
+        <div class="px-4 py-3 flex justify-between items-center max-w-2xl mx-auto">
+            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+                🚢 補給快選
+            </h1>
+        </div>
+        <nav class="flex overflow-x-auto hide-scrollbar px-2 pb-2 gap-2 max-w-2xl mx-auto" id="categoryTabs"></nav>
+    </header>
+
+    <div class="h-28"></div>
+
+    <main class="max-w-2xl mx-auto px-3 space-y-6">
+        <section>
+            <div id="presetsGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
+        </section>
+    </main>
+
+    <!-- FABs -->
+    <div class="fixed bottom-6 w-full max-w-2xl left-1/2 transform -translate-x-1/2 px-4 z-30 pointer-events-none">
+        <div class="flex justify-between items-end pointer-events-auto">
+            <!-- Left: Add Custom -->
+            <button onclick="openCustomModal()"
+                class="bg-gray-800 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center tap-scale active:bg-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+            </button>
+
+            <!-- Right: View Cart -->
+            <button onclick="openCart()"
+                class="bg-primary text-white pl-5 pr-6 h-14 rounded-full shadow-xl flex items-center gap-3 tap-scale relative">
+                <div class="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span id="cartBadge"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center hidden">0</span>
+                </div>
+                <span class="font-bold text-lg">購物車</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Quantity Modal (For Presets) -->
+    <div id="qtyModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white w-[90%] max-w-sm rounded-2xl shadow-2xl p-6 transition-transform scale-95 duration-200"
+            id="qtyModalContent">
+            <h3 class="text-xl font-bold text-gray-800 mb-1" id="modalItemName">Item Name</h3>
+            <p class="text-sm text-gray-500 mb-6">請輸入數量 (Enter Quantity)</p>
+
+            <div class="flex items-center gap-3 mb-8">
+                <button onclick="adjustModalQty('modalQtyInput', -1)"
+                    class="w-12 h-12 rounded-xl bg-gray-100 text-gray-600 text-2xl font-bold active:bg-gray-200">-</button>
+                <input type="number" id="modalQtyInput"
+                    class="flex-1 text-center text-3xl font-bold border-b-2 border-primary outline-none py-2"
+                    value="10">
+                <button onclick="adjustModalQty('modalQtyInput', 1)"
+                    class="w-12 h-12 rounded-xl bg-primary text-white text-2xl font-bold active:bg-blue-700">+</button>
+            </div>
+            <div class="text-center text-gray-400 text-sm mb-6" id="modalUnitHint">單位: 個</div>
+
+            <div class="flex gap-3">
+                <button onclick="closeQtyModal()"
+                    class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold active:bg-gray-200">取消</button>
+                <button onclick="confirmAddToOrder()"
+                    class="flex-1 py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-blue-500/30 active:scale-95">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Cart Item Modal -->
+    <div id="editModal"
+        class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white w-[90%] max-w-sm rounded-2xl shadow-2xl p-6 transition-transform scale-95 duration-200"
+            id="editModalContent">
+            <h3 class="text-xl font-bold text-gray-800 mb-1" id="editItemName">Item Name</h3>
+            <p class="text-sm text-gray-500 mb-6">修改數量與單位 (Edit Item)</p>
+
+            <div class="flex items-center gap-3 mb-4">
+                <button onclick="adjustModalQty('editQtyInput', -1)"
+                    class="w-12 h-12 rounded-xl bg-gray-100 text-gray-600 text-2xl font-bold active:bg-gray-200">-</button>
+                <input type="number" id="editQtyInput"
+                    class="flex-1 text-center text-3xl font-bold border-b-2 border-primary outline-none py-2" value="1">
+                <button onclick="adjustModalQty('editQtyInput', 1)"
+                    class="w-12 h-12 rounded-xl bg-primary text-white text-2xl font-bold active:bg-blue-700">+</button>
+            </div>
+
+            <div class="mb-8">
+                <label class="text-xs font-bold text-gray-500 ml-1">單位 (Unit)</label>
+                <input type="text" id="editUnitInput"
+                    class="w-full bg-gray-50 p-3 rounded-lg border-none focus:ring-2 focus:ring-primary font-bold text-lg text-center mt-1"
+                    placeholder="單位" value="">
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeEditModal()"
+                    class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold active:bg-gray-200">取消</button>
+                <button onclick="confirmEdit()"
+                    class="flex-1 py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-blue-500/30 active:scale-95">更新</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Custom Item Modal -->
+    <div id="customModal"
+        class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white w-full sm:w-[90%] max-w-sm sm:rounded-2xl rounded-t-2xl shadow-2xl p-6 transition-transform translate-y-full sm:translate-y-0 duration-300"
+            id="customModalContent">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">✨ 新增自訂品項</h3>
+
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="text-xs font-bold text-gray-500">分類</label>
+                    <select id="customCat"
+                        class="w-full bg-gray-50 p-3 rounded-lg border-none focus:ring-2 focus:ring-primary font-bold text-lg">
+                        <option value="食品">食品 (Food)</option>
+                        <option value="乾貨">日用/乾貨 (Daily)</option>
+                        <option value="五金">五金 (Hardware)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500">品名</label>
+                    <input type="text" id="customName"
+                        class="w-full bg-gray-50 p-3 rounded-lg border-none focus:ring-2 focus:ring-primary font-bold text-lg"
+                        placeholder="輸入名稱...">
+                </div>
+                <div class="flex gap-3">
+                    <div class="flex-1">
+                        <label class="text-xs font-bold text-gray-500">數量</label>
+                        <input type="number" id="customQty"
+                            class="w-full bg-gray-50 p-3 rounded-lg border-none focus:ring-2 focus:ring-primary font-bold text-lg text-center"
+                            value="10">
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-xs font-bold text-gray-500">單位</label>
+                        <input type="text" id="customUnit"
+                            class="w-full bg-gray-50 p-3 rounded-lg border-none focus:ring-2 focus:ring-primary font-bold text-lg text-center"
+                            value="個">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeCustomModal()"
+                    class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold active:bg-gray-200">取消</button>
+                <button onclick="confirmAddCustom()"
+                    class="flex-1 py-3 rounded-xl bg-gray-800 text-white font-bold shadow-lg active:scale-95">加入清單</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Drawer -->
+    <div id="cartDrawer"
+        class="fixed inset-0 z-50 transform translate-x-full transition-transform duration-300 bg-gray-50 flex flex-col">
+        <div class="bg-white px-4 py-3 shadow-sm border-b flex justify-between items-center">
+            <h2 class="text-xl font-bold text-gray-800">🛒 購物車</h2>
+            <button onclick="closeCart()" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 space-y-3" id="cartList">
+            <!-- Items injected here -->
+        </div>
+
+        <div class="bg-white p-4 border-t safe-area-bottom">
+            <button onclick="downloadJSON()"
+                class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 text-lg flex justify-center items-center gap-2 active:scale-98 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                匯出 JSON 檔案
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-6 py-3 rounded-full opacity-0 pointer-events-none transition-opacity duration-300 z-[70] text-sm font-bold">
+        Msg</div>
+
+    <script>
+        // --- Data ---
+        const TABS = [
+            { id: 'food', label: '食品', icon: '🍎', sourceCategory: '食品' },
+            { id: 'daily', label: '日用', icon: '🧻', sourceCategory: '乾貨' },
+            { id: 'hardware', label: '五金', icon: '🔧', sourceCategory: '五金' },
+        ];
+        const presetsData = [
+            { "id": 1, "category": "食品", "item": "雞蛋", "quantity": 600, "unit": "個", "common": true },
+            { "id": 2, "category": "食品", "item": "雞肉", "quantity": 60, "unit": "公斤", "common": true },
+            { "id": 3, "category": "食品", "item": "雞腿", "quantity": 30, "unit": "公斤", "common": true },
+            { "id": 4, "category": "食品", "item": "雞爪", "quantity": 20, "unit": "公斤", "common": false },
+            { "id": 5, "category": "食品", "item": "雞心", "quantity": 10, "unit": "公斤", "common": false },
+            { "id": 6, "category": "食品", "item": "豬腿肉", "quantity": 60, "unit": "公斤", "common": true },
+            { "id": 7, "category": "食品", "item": "五花肉", "quantity": 40, "unit": "公斤", "common": true },
+            { "id": 8, "category": "食品", "item": "豬腳", "quantity": 30, "unit": "公斤", "common": false },
+            { "id": 9, "category": "食品", "item": "豬肝", "quantity": 20, "unit": "公斤", "common": false },
+            { "id": 10, "category": "食品", "item": "豬耳朵", "quantity": 30, "unit": "公斤", "common": false },
+            { "id": 11, "category": "食品", "item": "豬排骨", "quantity": 40, "unit": "公斤", "common": true },
+            { "id": 12, "category": "食品", "item": "魚", "quantity": 60, "unit": "公斤", "common": true },
+            { "id": 13, "category": "食品", "item": "花菜（白）", "quantity": 30, "unit": "公斤", "common": true },
+            { "id": 14, "category": "食品", "item": "白菜", "quantity": 50, "unit": "公斤", "common": true },
+            { "id": 15, "category": "食品", "item": "包菜", "quantity": 50, "unit": "公斤", "common": true },
+            { "id": 16, "category": "食品", "item": "空心菜", "quantity": 30, "unit": "公斤", "common": true },
+            { "id": 17, "category": "食品", "item": "小白菜", "quantity": 30, "unit": "公斤", "common": true },
+            { "id": 18, "category": "食品", "item": "香菜", "quantity": 20, "unit": "公斤", "common": false },
+            { "id": 19, "category": "食品", "item": "菠菜", "quantity": 20, "unit": "公斤", "common": true },
+            { "id": 20, "category": "食品", "item": "冬瓜", "quantity": 50, "unit": "公斤", "common": true },
+            { "id": 21, "category": "食品", "item": "南瓜", "quantity": 30, "unit": "公斤", "common": true },
+            { "id": 22, "category": "食品", "item": "黃瓜", "quantity": 20, "unit": "公斤", "common": true },
+            { "id": 23, "category": "食品", "item": "地瓜", "quantity": 30, "unit": "公斤", "common": true },
+            { "id": 24, "category": "食品", "item": "西芹", "quantity": 10, "unit": "公斤", "common": false },
+            { "id": 25, "category": "食品", "item": "西紅柿", "quantity": 10, "unit": "公斤", "common": true },
+            { "id": 26, "category": "食品", "item": "茄子", "quantity": 10, "unit": "公斤", "common": false },
+            { "id": 27, "category": "食品", "item": "豆芽", "quantity": 10, "unit": "公斤", "common": true },
+            { "id": 28, "category": "食品", "item": "豆腐", "quantity": 10, "unit": "公斤", "common": true },
+            { "id": 29, "category": "食品", "item": "土豆", "quantity": 50, "unit": "公斤", "common": true },
+            { "id": 30, "category": "食品", "item": "薑", "quantity": 5, "unit": "公斤", "common": true },
+            { "id": 31, "category": "食品", "item": "洋蔥", "quantity": 30, "unit": "公斤", "common": true },
+            { "id": 32, "category": "食品", "item": "蔥", "quantity": 2, "unit": "公斤", "common": true },
+            { "id": 1, "category": "乾貨", "item": "大米", "quantity": 240, "unit": "公斤", "common": true },
+            { "id": 2, "category": "乾貨", "item": "麵條", "quantity": 20, "unit": "公斤", "common": true },
+            { "id": 3, "category": "乾貨", "item": "排骨雞汁麵", "quantity": 10, "unit": "箱", "common": true },
+            { "id": 4, "category": "乾貨", "item": "麵粉", "quantity": 50, "unit": "公斤", "common": true },
+            { "id": 5, "category": "乾貨", "item": "酵母粉", "quantity": 10, "unit": "盒", "common": true },
+            { "id": 6, "category": "乾貨", "item": "米粉", "quantity": 20, "unit": "公斤", "common": true },
+            { "id": 7, "category": "乾貨", "item": "咖啡", "quantity": 50, "unit": "袋", "common": true },
+            { "id": 8, "category": "乾貨", "item": "礦泉水", "quantity": 50, "unit": "箱", "common": true },
+            { "id": 9, "category": "乾貨", "item": "舒跑", "quantity": 50, "unit": "箱", "common": true },
+            { "id": 10, "category": "乾貨", "item": "老乾媽", "quantity": 3, "unit": "箱", "common": true },
+            { "id": 11, "category": "乾貨", "item": "維士比", "quantity": 2, "unit": "箱", "common": true },
+            { "id": 12, "category": "乾貨", "item": "啤酒", "quantity": 10, "unit": "箱", "common": true },
+            { "id": 13, "category": "乾貨", "item": "大蝦", "quantity": 20, "unit": "公斤", "common": true },
+            { "id": 14, "category": "乾貨", "item": "魷魚", "quantity": 20, "unit": "公斤", "common": true },
+            { "id": 15, "category": "乾貨", "item": "塑膠掃把", "quantity": 10, "unit": "把", "common": true },
+            { "id": 16, "category": "乾貨", "item": "塑膠畚箕", "quantity": 10, "unit": "個", "common": true },
+            { "id": 17, "category": "乾貨", "item": "拖把", "quantity": 10, "unit": "把", "common": true },
+            { "id": 18, "category": "乾貨", "item": "竹掃帚", "quantity": 10, "unit": "把", "common": true },
+            { "id": 19, "category": "乾貨", "item": "沐浴露", "quantity": 24, "unit": "瓶", "common": true },
+            { "id": 20, "category": "乾貨", "item": "香皂", "quantity": 30, "unit": "個", "common": true },
+            { "id": 21, "category": "乾貨", "item": "鹽巴", "quantity": 24, "unit": "瓶", "common": true },
+            { "id": 22, "category": "乾貨", "item": "醬油", "quantity": 24, "unit": "瓶", "common": true },
+            { "id": 23, "category": "乾貨", "item": "雞粉", "quantity": 10, "unit": "罐", "common": true },
+            { "id": 24, "category": "乾貨", "item": "魚罐頭", "quantity": 5, "unit": "箱", "common": true },
+            { "id": 25, "category": "乾貨", "item": "香菇", "quantity": 10, "unit": "公斤", "common": true },
+            { "id": 26, "category": "乾貨", "item": "辣椒醬", "quantity": 5, "unit": "瓶", "common": true },
+            { "id": 27, "category": "乾貨", "item": "大桶煮飯油", "quantity": 8, "unit": "桶", "common": true },
+            { "id": 28, "category": "乾貨", "item": "黏鼠板", "quantity": 10, "unit": "張", "common": true },
+            { "id": 29, "category": "乾貨", "item": "殺蟲劑", "quantity": 10, "unit": "罐", "common": true },
+            { "id": 30, "category": "五金", "item": "螺絲", "quantity": 100, "unit": "個", "common": true },
+            { "id": 31, "category": "五金", "item": "空氣快速接頭", "quantity": 5, "unit": "個", "common": true }
+        ];
+
+        let currentTab = 'food';
+        let orderList = JSON.parse(localStorage.getItem('supplyOrderList')) || [];
+        let currentModalItem = null;
+        let editingIndex = -1;
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTabs();
+            renderPresets();
+            updateCartBadge();
+        });
+
+        // --- Core ---
+        function renderTabs() {
+            const container = document.getElementById('categoryTabs');
+            container.innerHTML = TABS.map(tab => {
+                const isActive = tab.id === currentTab;
+                const activeClass = isActive
+                    ? 'bg-primary text-white shadow-md transform scale-105'
+                    : 'bg-white text-gray-500 border border-gray-100';
+                return `<button onclick="switchTab('${tab.id}')" class="flex-shrink-0 px-5 py-2.5 rounded-full font-bold text-sm transition-all-200 ${activeClass}"><span class="mr-1">${tab.icon}</span> ${tab.label}</button>`;
+            }).join('');
+        }
+
+        function renderPresets() {
+            const container = document.getElementById('presetsGrid');
+            const tabConfig = TABS.find(t => t.id === currentTab);
+            const items = presetsData.filter(item => item.category === tabConfig.sourceCategory);
+
+            if (items.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">此分類尚無項目</div>`;
+                return;
+            }
+
+            container.innerHTML = items.map(item => {
+                const isInCart = orderList.some(o => o.item === item.item && o.category === item.category);
+                const activeClass = isInCart ? 'border-primary ring-2 ring-primary/20 bg-blue-50' : 'border-white bg-white hover:border-gray-200';
+                const textClass = isInCart ? 'text-primary' : 'text-gray-800';
+
+                return `
+                <button onclick="handlePresetClick(${item.id})" class="p-4 rounded-2xl border-2 shadow-sm transition-all-200 tap-scale relative group overflow-hidden ${activeClass}">
+                    ${isInCart ? '<div class="absolute top-2 right-2 text-primary check-icon"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></div>' : ''}
+                    <div class="font-bold text-lg mb-1 ${textClass}">${item.item}</div>
+                    <div class="text-xs text-gray-400 font-medium">預設: ${item.quantity} ${item.unit}</div>
+                </button>
+                `;
+            }).join('');
+        }
+
+        function switchTab(id) {
+            currentTab = id;
+            renderTabs();
+            renderPresets();
+        }
+
+        function handlePresetClick(id) {
+            const item = presetsData.find(p => p.id === id);
+            if (!item) return;
+
+            const existingIdx = orderList.findIndex(o => o.item === item.item && o.category === item.category);
+            if (existingIdx !== -1) {
+                if (confirm(`確定移除「${item.item}」？`)) removeItem(existingIdx);
+            } else {
+                openQtyModal(item);
+            }
+        }
+
+        // --- Modals ---
+
+        // Qty Modal
+        function openQtyModal(item) {
+            currentModalItem = item;
+            document.getElementById('modalItemName').innerText = item.item;
+            document.getElementById('modalQtyInput').value = item.quantity;
+            document.getElementById('modalUnitHint').innerText = `單位: ${item.unit}`;
+            toggleModal('qtyModal', true);
+            setTimeout(() => document.getElementById('modalQtyInput').select(), 50);
+        }
+
+        function closeQtyModal() {
+            toggleModal('qtyModal', false);
+            currentModalItem = null;
+        }
+
+        // Edit Modal
+        function openEditModal(index) {
+            editingIndex = index;
+            const item = orderList[index];
+            document.getElementById('editItemName').innerText = item.item;
+            document.getElementById('editQtyInput').value = item.quantity;
+            document.getElementById('editUnitInput').value = item.unit;
+            toggleModal('editModal', true);
+            setTimeout(() => document.getElementById('editQtyInput').select(), 50);
+        }
+
+        function closeEditModal() {
+            toggleModal('editModal', false);
+            editingIndex = -1;
+        }
+
+        function confirmEdit() {
+            if (editingIndex === -1) return;
+            const qty = parseFloat(document.getElementById('editQtyInput').value);
+            const unit = document.getElementById('editUnitInput').value.trim();
+
+            if (!qty || qty <= 0) return alert('請輸入有效數量');
+            if (!unit) return alert('請輸入單位');
+
+            orderList[editingIndex].quantity = qty;
+            orderList[editingIndex].unit = unit;
+
+            saveAndRender();
+            closeEditModal();
+            showToast("已更新");
+        }
+
+        // Custom Modal
+        function openCustomModal() {
+            const m = document.getElementById('customModal');
+            m.classList.remove('hidden');
+            setTimeout(() => {
+                m.classList.remove('opacity-0');
+                document.getElementById('customModalContent').classList.remove('translate-y-full');
+            }, 10);
+            document.getElementById('customName').focus();
+        }
+
+        function closeCustomModal() {
+            const m = document.getElementById('customModal');
+            document.getElementById('customModalContent').classList.add('translate-y-full');
+            m.classList.add('opacity-0');
+            setTimeout(() => {
+                m.classList.add('hidden');
+            }, 300);
+        }
+
+        function toggleModal(id, show) {
+            const modal = document.getElementById(id);
+            const content = modal.querySelector('div'); // first child
+
+            if (show) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    content.classList.remove('scale-95');
+                }, 10);
+            } else {
+                modal.classList.add('opacity-0');
+                content.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 200);
+            }
+        }
+
+        function adjustModalQty(inputId, delta) {
+            const el = document.getElementById(inputId);
+            let val = parseFloat(el.value) || 0;
+            val += delta;
+            if (val < 0) val = 0;
+            el.value = val;
+        }
+
+        // --- Logic ---
+
+        function confirmAddToOrder() {
+            if (!currentModalItem) return;
+            const qty = parseFloat(document.getElementById('modalQtyInput').value);
+            addItem({ ...currentModalItem, quantity: qty, id: Date.now() });
+            closeQtyModal();
+        }
+
+        function confirmAddCustom() {
+            const cat = document.getElementById('customCat').value;
+            const name = document.getElementById('customName').value.trim();
+            const qty = parseFloat(document.getElementById('customQty').value);
+            const unit = document.getElementById('customUnit').value.trim();
+
+            if (!name) return alert('請輸入名稱');
+
+            addItem({
+                id: Date.now(),
+                category: cat,
+                item: name,
+                quantity: qty || 1,
+                unit: unit || '個'
+            });
+
+            // Clear inputs
+            document.getElementById('customName').value = '';
+            closeCustomModal();
+        }
+
+        function addItem(itemObj) {
+            orderList.unshift(itemObj);
+            saveAndRender();
+            showToast(`已加入: ${itemObj.item}`);
+        }
+
+        function removeItem(index) {
+            orderList.splice(index, 1);
+            saveAndRender();
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('supplyOrderList', JSON.stringify(orderList));
+            renderPresets();
+            renderCartList();
+            updateCartBadge();
+        }
+
+        function updateCartBadge() {
+            const el = document.getElementById('cartBadge');
+            if (orderList.length > 0) {
+                el.innerText = orderList.length;
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // --- Cart Drawer ---
+
+        function openCart() {
+            renderCartList();
+            const drawer = document.getElementById('cartDrawer');
+            drawer.classList.remove('translate-x-full');
+        }
+
+        function closeCart() {
+            document.getElementById('cartDrawer').classList.add('translate-x-full');
+        }
+
+        function renderCartList() {
+            const container = document.getElementById('cartList');
+            if (orderList.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-gray-400">購物車是空的</div>`;
+                return;
+            }
+
+            container.innerHTML = orderList.map((item, index) => `
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center animate-fade-in">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">${item.category}</span>
+                            <span class="font-bold text-gray-800 text-lg">${item.item}</span>
+                        </div>
+                        <div class="text-sm text-gray-500">數量: <span class="font-bold text-gray-800">${item.quantity}</span> ${item.unit}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                         <button onclick="openEditModal(${index})" class="p-2 text-gray-400 hover:text-primary transition-colors bg-gray-50 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </button>
+                        <button onclick="removeItem(${index})" class="p-2 text-gray-400 hover:text-red-500 transition-colors bg-gray-50 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function downloadJSON() {
+            if (orderList.length === 0) return alert("清單是空的");
+            const dataStr = JSON.stringify(orderList, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const now = new Date();
+            const filename = `supply_order_${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}.json`;
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.remove('opacity-0', 'translate-y-4');
+            t.classList.add('opacity-100');
+            setTimeout(() => {
+                t.classList.remove('opacity-100');
+                t.classList.add('opacity-0');
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>

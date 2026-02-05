@@ -1,0 +1,506 @@
+[
+    {
+        "id": 1,
+        "category": "食品",
+        "item": "雞蛋",
+        "quantity": 600,
+        "unit": "個",
+        "common": true
+    },
+    {
+        "id": 2,
+        "category": "食品",
+        "item": "雞肉",
+        "quantity": 60,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 3,
+        "category": "食品",
+        "item": "雞腿",
+        "quantity": 30,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 4,
+        "category": "食品",
+        "item": "雞爪",
+        "quantity": 20,
+        "unit": "公斤",
+        "common": false
+    },
+    {
+        "id": 5,
+        "category": "食品",
+        "item": "雞心",
+        "quantity": 10,
+        "unit": "公斤",
+        "common": false
+    },
+    {
+        "id": 6,
+        "category": "食品",
+        "item": "豬腿肉",
+        "quantity": 60,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 7,
+        "category": "食品",
+        "item": "五花肉",
+        "quantity": 40,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 8,
+        "category": "食品",
+        "item": "豬腳",
+        "quantity": 30,
+        "unit": "公斤",
+        "common": false
+    },
+    {
+        "id": 9,
+        "category": "食品",
+        "item": "豬肝",
+        "quantity": 20,
+        "unit": "公斤",
+        "common": false
+    },
+    {
+        "id": 10,
+        "category": "食品",
+        "item": "豬耳朵",
+        "quantity": 30,
+        "unit": "公斤",
+        "common": false
+    },
+    {
+        "id": 11,
+        "category": "食品",
+        "item": "豬排骨",
+        "quantity": 40,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 12,
+        "category": "食品",
+        "item": "魚",
+        "quantity": 60,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 13,
+        "category": "食品",
+        "item": "花菜（白）",
+        "quantity": 30,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 14,
+        "category": "食品",
+        "item": "白菜",
+        "quantity": 50,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 15,
+        "category": "食品",
+        "item": "包菜",
+        "quantity": 50,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 16,
+        "category": "食品",
+        "item": "空心菜",
+        "quantity": 30,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 17,
+        "category": "食品",
+        "item": "小白菜",
+        "quantity": 30,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 18,
+        "category": "食品",
+        "item": "香菜",
+        "quantity": 20,
+        "unit": "公斤",
+        "common": false
+    },
+    {
+        "id": 19,
+        "category": "食品",
+        "item": "菠菜",
+        "quantity": 20,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 20,
+        "category": "食品",
+        "item": "冬瓜",
+        "quantity": 50,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 21,
+        "category": "食品",
+        "item": "南瓜",
+        "quantity": 30,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 22,
+        "category": "食品",
+        "item": "黃瓜",
+        "quantity": 20,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 23,
+        "category": "食品",
+        "item": "地瓜",
+        "quantity": 30,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 24,
+        "category": "食品",
+        "item": "西芹",
+        "quantity": 10,
+        "unit": "公斤",
+        "common": false
+    },
+    {
+        "id": 25,
+        "category": "食品",
+        "item": "西紅柿",
+        "quantity": 10,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 26,
+        "category": "食品",
+        "item": "茄子",
+        "quantity": 10,
+        "unit": "公斤",
+        "common": false
+    },
+    {
+        "id": 27,
+        "category": "食品",
+        "item": "豆芽",
+        "quantity": 10,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 28,
+        "category": "食品",
+        "item": "豆腐",
+        "quantity": 10,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 29,
+        "category": "食品",
+        "item": "土豆",
+        "quantity": 50,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 30,
+        "category": "食品",
+        "item": "薑",
+        "quantity": 5,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 31,
+        "category": "食品",
+        "item": "洋蔥",
+        "quantity": 30,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 1,
+        "category": "乾貨",
+        "item": "大米",
+        "quantity": 240,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 2,
+        "category": "乾貨",
+        "item": "麵條",
+        "quantity": 20,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 3,
+        "category": "乾貨",
+        "item": "排骨雞汁麵",
+        "quantity": 10,
+        "unit": "箱",
+        "common": true
+    },
+    {
+        "id": 4,
+        "category": "乾貨",
+        "item": "麵粉",
+        "quantity": 50,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 5,
+        "category": "乾貨",
+        "item": "酵母粉",
+        "quantity": 10,
+        "unit": "盒",
+        "common": true
+    },
+    {
+        "id": 6,
+        "category": "乾貨",
+        "item": "米粉",
+        "quantity": 20,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 7,
+        "category": "乾貨",
+        "item": "咖啡",
+        "quantity": 50,
+        "unit": "袋",
+        "common": true
+    },
+    {
+        "id": 8,
+        "category": "乾貨",
+        "item": "礦泉水",
+        "quantity": 50,
+        "unit": "箱",
+        "common": true
+    },
+    {
+        "id": 9,
+        "category": "乾貨",
+        "item": "舒跑",
+        "quantity": 50,
+        "unit": "箱",
+        "common": true
+    },
+    {
+        "id": 10,
+        "category": "乾貨",
+        "item": "老乾媽",
+        "quantity": 3,
+        "unit": "箱",
+        "common": true
+    },
+    {
+        "id": 11,
+        "category": "乾貨",
+        "item": "維士比",
+        "quantity": 2,
+        "unit": "箱",
+        "common": true
+    },
+    {
+        "id": 12,
+        "category": "乾貨",
+        "item": "啤酒",
+        "quantity": 10,
+        "unit": "箱",
+        "common": true
+    },
+    {
+        "id": 13,
+        "category": "乾貨",
+        "item": "大蝦",
+        "quantity": 20,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 14,
+        "category": "乾貨",
+        "item": "魷魚",
+        "quantity": 20,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 15,
+        "category": "乾貨",
+        "item": "塑膠掃把",
+        "quantity": 10,
+        "unit": "把",
+        "common": true
+    },
+    {
+        "id": 16,
+        "category": "乾貨",
+        "item": "塑膠畚箕",
+        "quantity": 10,
+        "unit": "個",
+        "common": true
+    },
+    {
+        "id": 17,
+        "category": "乾貨",
+        "item": "拖把",
+        "quantity": 10,
+        "unit": "把",
+        "common": true
+    },
+    {
+        "id": 18,
+        "category": "乾貨",
+        "item": "竹掃帚",
+        "quantity": 10,
+        "unit": "把",
+        "common": true
+    },
+    {
+        "id": 19,
+        "category": "乾貨",
+        "item": "沐浴露",
+        "quantity": 24,
+        "unit": "瓶",
+        "common": true
+    },
+    {
+        "id": 20,
+        "category": "乾貨",
+        "item": "香皂",
+        "quantity": 30,
+        "unit": "個",
+        "common": true
+    },
+    {
+        "id": 21,
+        "category": "乾貨",
+        "item": "鹽巴",
+        "quantity": 24,
+        "unit": "瓶",
+        "common": true
+    },
+    {
+        "id": 22,
+        "category": "乾貨",
+        "item": "醬油",
+        "quantity": 24,
+        "unit": "瓶",
+        "common": true
+    },
+    {
+        "id": 23,
+        "category": "乾貨",
+        "item": "雞粉",
+        "quantity": 10,
+        "unit": "罐",
+        "common": true
+    },
+    {
+        "id": 24,
+        "category": "乾貨",
+        "item": "魚罐頭",
+        "quantity": 5,
+        "unit": "箱",
+        "common": true
+    },
+    {
+        "id": 25,
+        "category": "乾貨",
+        "item": "香菇",
+        "quantity": 10,
+        "unit": "公斤",
+        "common": true
+    },
+    {
+        "id": 26,
+        "category": "乾貨",
+        "item": "辣椒醬",
+        "quantity": 5,
+        "unit": "瓶",
+        "common": true
+    },
+    {
+        "id": 27,
+        "category": "乾貨",
+        "item": "大桶煮飯油",
+        "quantity": 8,
+        "unit": "桶",
+        "common": true
+    },
+    {
+        "id": 28,
+        "category": "乾貨",
+        "item": "黏鼠板",
+        "quantity": 10,
+        "unit": "張",
+        "common": true
+    },
+    {
+        "id": 29,
+        "category": "乾貨",
+        "item": "殺蟲劑",
+        "quantity": 10,
+        "unit": "罐",
+        "common": true
+    },
+    {
+        "id": 30,
+        "category": "五金",
+        "item": "螺絲",
+        "quantity": 100,
+        "unit": "個",
+        "common": true
+    },
+    {
+        "id": 31,
+        "category": "五金",
+        "item": "空氣快速接頭",
+        "quantity": 5,
+        "unit": "個",
+        "common": true
+    },
+    {
+        "id": 32,
+        "category": "食物",
+        "item": "蔥",
+        "quantity": 2,
+        "unit": "公斤",
+        "common": true
+    }
+]
